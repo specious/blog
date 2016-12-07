@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>A blog by Ildar Sagdejev</title>
+  <subtitle>Adventures in software engineering</subtitle>
+  <link href="/blog/atom.xml" rel="self"/>
+  
+  <link href="http://specious.github.io/blog/"/>
+  <updated>2016-12-07T18:39:32.000Z</updated>
+  <id>http://specious.github.io/blog/</id>
+  
+  <author>
+    <name>Ildar Sagdejev</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Starting a Node.js app with ClojureScript and Boot</title>
+    <link href="http://specious.github.io/blog/2016/12/07/Starting-a-NodeJS-app-with-ClojureScript-and-Boot/"/>
+    <id>http://specious.github.io/blog/2016/12/07/Starting-a-NodeJS-app-with-ClojureScript-and-Boot/</id>
+    <published>2016-12-07T18:39:21.000Z</published>
+    <updated>2016-12-07T18:39:32.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;I set out to write a Node.js application in &lt;a href=&quot;http://clojurescript.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;ClojureScript&lt;/a&gt;, using &lt;
+    
+    </summary>
+    
+    
+      <category term="clojurescript" scheme="http://specious.github.io/blog/tags/clojurescript/"/>
+    
+      <category term="boot" scheme="http://specious.github.io/blog/tags/boot/"/>
+    
+  </entry>
+  
+</feed>
