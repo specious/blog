@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+    <head>
+		
+        <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="Adventures in software engineering">
+        <link rel="shortcut icon" href="asset/portrait.jpg"/>
+        <link rel="alternate" type="application/rss+xml" title="Ildar Sagdejev" href="atom.xml">
+        <title>Starting a Node.js app with ClojureScript and Boot | A blog by Ildar Sagdejev</title>
+        <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/blog/styles/crisp.css">
+        <meta name="HandheldFriendly" content="True" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+    
+		<body class="post-template">
+	
+
+        <header id="header">
+          <div id="logo-wrapper"><a id="logo" href="/blog/"><img src="/blog/asset/portrait.jpg" alt="A blog by Ildar Sagdejev" /></a></div>
+            <h1><a href="/blog/">Ildar Sagdejev</a></h1>
+            <p>Adventures in software engineering</p>
+            <div id="follow-icons">
+	<a href="http://github.com/specious"><i class="fa fa-github-square fa-2x"></i></a>
+	<a href="http://facebook.com/tknomad"><i class="fa fa-facebook-square fa-2x"></i></a>
+	<a href="http://twitter.com/tknomad"><i class="fa fa-twitter-square fa-2x"></i></a>
+	<a href="http://linkedin.com/in/specious"><i class="fa fa-linkedin-square fa-2x"></i></a>
+	<a href="atom.xml"><i class="fa fa-rss-square fa-2x"></i></a>
+</div>
+<h6><a href="http://specious.github.io">Website</a></h6>
+        </header>
+
+        <main id="content">
+        
+
+<article class="post">
+  
+  December 7, 2016
+  
+    <span class="taglist">  &middot; 
+    
+    
+      <a href='/blog/tags/clojurescript/'>clojurescript</a> 
+    
+      <a href='/blog/tags/boot/'>boot</a> 
+    
+    </span>
+  
+
+  <h1 class="post-title">Starting a Node.js app with ClojureScript and Boot</h1>
+  <section class="post-content article-entry">
+    <p>I set out to write a Node.js application in <a href="http://clojurescript.org/" target="_blank" rel="external">ClojureScript</a>, using <a href="https://github.com/boot-clj/boot" target="_blank" rel="external">Boot</a> as my build tool.  Because these tools are still young and rapidly evolving, I had to sort through an abundance of incomplete, misleading or out-of-date information to figure it out.  For reference, <a href="http://www.mase.io/code/clojure/node/2015/01/24/getting-started-with-clojurecript-and-node/" target="_blank" rel="external">here</a> is an excellent article on how to do the same thing using Leiningen.</p>
+<p>tl;dr - here’s the <a href="https://github.com/specious/clojurescript-nodejs-starter-kit" target="_blank" rel="external">quickstarter kit</a>.</p>
+<p>Let’s start off by creating a file <code>src/app/core.cljs</code>:</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">(<span class="name"><span class="builtin-name">ns</span></span> app.core</div><div class="line">  (<span class="symbol">:require</span> [cljs.nodejs <span class="symbol">:as</span> nodejs]))</div><div class="line"></div><div class="line">(<span class="name">nodejs/enable-util-print!</span>)</div><div class="line"></div><div class="line">(<span class="name"><span class="builtin-name">defn</span></span> main [&amp; args]</div><div class="line">  (<span class="name">println</span> <span class="string">"Abracadabra!"</span>))</div><div class="line"></div><div class="line">(<span class="name"><span class="builtin-name">set!</span></span> *main-cli-fn* main)</div></pre></td></tr></table></figure>
+<p>The namespace <code>app.core</code> reflects the source file <code>core.cljs</code> placed in the <code>app/</code> directory.  We can compile this directly using the ClojureScript compiler:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ cljsc src/app/core.cljs <span class="string">'&#123;:target :nodejs :optimizations :advanced :output-to "out/main.js"&#125;'</span></div></pre></td></tr></table></figure>
+<p>There are a number of ways to install the ClojureScript compiler, but <a href="http://www.ericbmerritt.com/2011/08/06/setting-up-clojurescript.html" target="_blank" rel="external">building it from source</a> worked best for me.  If all went well, you can run your app with:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ node out/main.js</div></pre></td></tr></table></figure>
+<p>Using the ClojureScript compiler manually can be tricky.  If you can’t quite get it to work, don’t worry.  We’re going to use the flexible Boot build tool to automate this process.</p>
+<p>Let’s create a <code>build.boot</code> project file:</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">(<span class="name">set-env!</span></div><div class="line">  <span class="symbol">:source-paths</span> #&#123;<span class="string">"src"</span>&#125;</div><div class="line">  <span class="symbol">:dependencies</span> '[[adzerk/boot-cljs <span class="string">"1.7.228-2"</span> <span class="symbol">:scope</span> <span class="string">"test"</span>]])</div><div class="line"></div><div class="line">(<span class="name">require</span></div><div class="line">  '[adzerk.boot-cljs <span class="symbol">:refer</span> [cljs]])</div></pre></td></tr></table></figure>
+<p>You can adjust the <code>boot-cljs</code> version to reflect the <a href="https://clojars.org/adzerk/boot-cljs" target="_blank" rel="external">latest</a> on Clojars.  The point of Boot is to be a flexible build automation system that lets you assemble your own pipeline using a rich assortment of independent composable <a href="https://github.com/boot-clj/boot/wiki/Tasks" target="_blank" rel="external">tasks</a>.</p>
+<p>Let’s define a file watcher task that responds to changes by compiling our Node.js app with source mapping enabled:</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">(<span class="name">deftask</span> dev</div><div class="line">  <span class="string">"Watch/compile files in development"</span></div><div class="line">  []</div><div class="line">  (<span class="name"><span class="builtin-name">comp</span></span></div><div class="line">    (<span class="name">watch</span>)</div><div class="line">    (<span class="name">cljs</span> <span class="symbol">:source-map</span> <span class="literal">true</span></div><div class="line">          <span class="symbol">:optimizations</span> <span class="symbol">:none</span></div><div class="line">          <span class="symbol">:compiler-options</span> &#123;<span class="symbol">:target</span> <span class="symbol">:nodejs</span>&#125;)</div><div class="line">    (<span class="name">target</span>)))</div></pre></td></tr></table></figure>
+<p>Running <code>boot dev</code> should now look something like this:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$ boot dev</div><div class="line"></div><div class="line">Starting file watcher (CTRL-C to quit)...</div><div class="line"></div><div class="line">Writing main.cljs.edn...</div><div class="line">Compiling ClojureScript...</div><div class="line">• main.js</div><div class="line">Writing target dir(s)...</div><div class="line">Elapsed time: 9,342 sec</div></pre></td></tr></table></figure>
+<p>The app should now appear in the <code>target/</code> directory, which is created by the <code>target</code> task, introduced as a standalone operation in Boot 2.5 (See: <a href="http://www.adzerk.com/blog/2015/12/boot-2.5-released/" target="_blank" rel="external">Boot 2.5: Slow is smooth, smooth is fast</a>).  You must <code>cd</code> into the <code>target</code> directory to run the compiled app because at this point it relies on the relative paths of the dependencies generated by the Google Closure Compiler in the <code>target/main.out/</code> directory.</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ <span class="built_in">cd</span> target</div><div class="line">$ node main.js</div></pre></td></tr></table></figure>
+<p>For building the final product, let’s add a <code>prod</code> task:</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">(<span class="name">deftask</span> prod</div><div class="line">  <span class="string">"Compile for production"</span></div><div class="line">  []</div><div class="line">  (<span class="name"><span class="builtin-name">comp</span></span></div><div class="line">    (<span class="name">cljs</span> <span class="symbol">:optimizations</span> <span class="symbol">:advanced</span></div><div class="line">          <span class="symbol">:compiler-options</span> &#123;<span class="symbol">:target</span> <span class="symbol">:nodejs</span>&#125;)</div><div class="line">    (<span class="name">target</span>)))</div></pre></td></tr></table></figure>
+<p>You are now ready to start writing your Node.js application in ClojureScript.  This guide has not covered installing JavaScript dependencies or the various other options you can pass to the compiler.  Note that we could have accomplished the same build process with the command line:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># dev build</span></div><div class="line">$ boot watch cljs -c <span class="string">'&#123;:target :nodejs&#125;'</span> target</div><div class="line"></div><div class="line"><span class="comment"># prod build</span></div><div class="line">$ boot cljs -c <span class="string">'&#123;:target :nodejs&#125;'</span> -O advanced target</div></pre></td></tr></table></figure>
+<p>However, a <code>build.boot</code> file will allow you to <a href="https://github.com/boot-clj/boot/wiki/Configuring-Boot" target="_blank" rel="external">expand</a> your build configuration as your project evolves.  More information about <code>boot-cljs</code> is available on the <a href="https://github.com/adzerk-oss/boot-cljs/wiki/Usage" target="_blank" rel="external">wiki</a>, though as usual some of it is geared specifically toward JavaScript in the browser.</p>
+
+  </section>
+  <footer class="post-footer">
+    <!--
+    <section class="author">
+      <h4>Ildar Sagdejev</h4>
+      <p></p>
+    </section>
+    -->
+  </footer>
+</article>
+<!--
+<nav class="pagination" role="pagination">
+    
+    <span class="page-number">•</span>
+    
+</nav>
+-->
+<!-- Begin Comments Code -->
+<div id="comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+      var disqus_shortname = 'specious-blog'; // required: replace example with your shortname
+      var disqus_identifier = '';
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">Comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+<!-- End Comments Code -->
+
+
+        </main>
+        <footer id="footer">
+            <section id="footer-message">&copy; 2016 Ildar Sagdejev. All rights reserved. Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. <a href="https://github.com/guolin/crisp-hexo-theme" target="_blank">crisp</a> theme by <a href="guolin.github.io" target="_blank">Guo Lin</a>.</section>
+        </footer>
+    </body>
+</html>
+
+
